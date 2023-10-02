@@ -5,17 +5,95 @@ from django_tgbot.models import AbstractTelegramUser, AbstractTelegramChat, Abst
 
 
 class TelegramUser(AbstractTelegramUser):
-    pass
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
 
 class TelegramChat(AbstractTelegramChat):
-    pass
+    class Meta:
+        verbose_name = "Чат"
+        verbose_name_plural = "Чаты"
 
 
 class TelegramState(AbstractTelegramState):
-    telegram_user = models.ForeignKey(TelegramUser, related_name='telegram_states', on_delete=CASCADE, blank=True, null=True)
-    telegram_chat = models.ForeignKey(TelegramChat, related_name='telegram_states', on_delete=CASCADE, blank=True, null=True)
+    telegram_user = models.ForeignKey(TelegramUser, related_name='telegram_states', on_delete=CASCADE, blank=True,
+                                      null=True)
+    telegram_chat = models.ForeignKey(TelegramChat, related_name='telegram_states', on_delete=CASCADE, blank=True,
+                                      null=True)
 
     class Meta:
         unique_together = ('telegram_user', 'telegram_chat')
 
+
+class Epoch(models.Model):
+    class Meta:
+        verbose_name = "Эпоха"
+        verbose_name_plural = "Эпохи"
+
+    start_year = models.CharField(max_length=25, blank=True, null=True, verbose_name="Начало")
+    end_year = models.CharField(max_length=25, blank=True, null=True, verbose_name="Конец")
+
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    image = models.ImageField(upload_to="epochs", blank=True, null=True, verbose_name="Картинка")
+
+    position = models.IntegerField(null=True, blank=True, verbose_name="Позиция")
+
+    def __str__(self):
+        start = self.start_year if self.start_year is not None else "..."
+        end = self.end_year if self.end_year is not None else "..."
+
+        if start == end:
+            return self.name
+        return f"{self.name} ({start} — {end})"
+
+
+class Topic(models.Model):
+    class Meta:
+        verbose_name = "Тема"
+        verbose_name_plural = "Темы"
+
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    image = models.ImageField(upload_to="topics", blank=True, null=True, verbose_name="Картинка")
+
+    def __str__(self):
+        return self.name
+
+
+class QuestionType(models.Model):
+    class Meta:
+        verbose_name = "Тип вопроса"
+        verbose_name_plural = "Типы вопроса"
+
+    name = models.CharField(max_length=200, verbose_name="Название")
+
+    def __str__(self):
+        return self.name
+
+
+class Note(models.Model):
+    class Meta:
+        verbose_name = "Шпаргалка"
+        verbose_name_plural = "Шпаргалки"
+
+    text = models.TextField(verbose_name="Текст")
+
+
+class Question(models.Model):
+    class Meta:
+        verbose_name = "Вопрос"
+        verbose_name_plural = "Вопросы"
+
+    type = models.ForeignKey(QuestionType, on_delete=models.CASCADE, verbose_name="Тип")
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, verbose_name="Тема")
+    epoch = models.ForeignKey(Epoch, on_delete=models.CASCADE, verbose_name="Эпоха")
+
+    image = models.ImageField(upload_to="questions", blank=True, null=True, verbose_name="Картинка")
+    text = models.TextField(verbose_name="Текст вопроса")
+
+    answer = models.CharField(max_length=250, verbose_name="Ответ")
+
+    def __str__(self):
+        return f"{self.text} - {self.epoch} | {self.topic}"

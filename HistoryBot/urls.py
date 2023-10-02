@@ -19,6 +19,6 @@ from django.urls import path, include
 from olymphistory_bot import urls as olymphistory_bot_urls
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('bot/', include(olymphistory_bot_urls))
+    path('bot/', include(olymphistory_bot_urls)),
+    path('', admin.site.urls),
 ]
