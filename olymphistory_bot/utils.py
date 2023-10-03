@@ -8,6 +8,7 @@ from django_tgbot.types.keyboardbutton import KeyboardButton
 from django_tgbot.types.replykeyboardmarkup import ReplyKeyboardMarkup
 
 from .bot import TelegramBot
+from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer
 
 import typing
 import io
@@ -21,3 +22,16 @@ def send_with_image(bot: TelegramBot, *args, text: str = "", image: typing.Optio
     if image:
         return bot.sendPhoto(*args, caption=text, photo=image, upload=True, **kwargs)
     return bot.sendMessage(*args, text=text, **kwargs)
+
+
+def get_questions(state: TelegramState):
+    data = state.get_memory()
+
+    queryset = Question.objects.all()
+
+    if data["epoch"] != "all":
+        queryset.filter(epoch=data["epoch"])
+    if data["topic"] != "all":
+        queryset.filter(topic=data["topic"])
+
+    return queryset

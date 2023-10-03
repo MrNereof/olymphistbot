@@ -94,6 +94,24 @@ class Question(models.Model):
     text = models.TextField(verbose_name="Текст вопроса")
 
     answer = models.CharField(max_length=250, verbose_name="Ответ")
+    note = models.ForeignKey(Note, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Заметка")
 
     def __str__(self):
         return f"{self.text} - {self.epoch} | {self.topic}"
+
+
+class Attempt(models.Model):
+    class Meta:
+        verbose_name = "Попытка"
+        verbose_name_plural = "Попытка"
+
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, verbose_name="Пользователь")
+    questions = models.ManyToManyField(Question, through="UserAnswer", verbose_name="Вопросы")
+
+
+class UserAnswer(models.Model):
+    attempt = models.ForeignKey(Attempt, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    answer = models.CharField(max_length=250, verbose_name="Ответ")
+    right = models.BooleanField(default=False, blank=True)

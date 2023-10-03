@@ -9,5 +9,20 @@ SELECT_TOPIC = "Выберите тему:"
 
 
 YOU_HAVE_EPOCH_SELECTED = "Вы выбрали следующую эпоху:"
-YOU_HAVE_TOPIC_SELECTED = "Вы выбрали следующую эпоху:"
+YOU_HAVE_TOPIC_SELECTED = "Вы выбрали следующую тему:"
 SELECTED = "<b>{title}</b>\n<i>{description}</i>\n<b>===========</b>"
+SELECTED_ALL = "<b>Все</b>"
+
+LEVEL_SELECT = "Выберите уровень сложности:"
+LEVEL_EASY = "Простой"
+LEVEL_HARD = "Сложный"
+
+NUMBER_OF_QUESTION = "Сколько вопросов вы хотите пройти (всего {count}):"
+INVALID_NUMBER = "Введёно недействительное число! Пожалуйста, введите снова."
+MAX_NUMBER = "Всего {count} вопросов по теме. Пожалуйста, попробуйте снова."
+
+QUESTION = "<b>Вопрос {pos}/{count}:</b>\n<i>{text}</i>"
+ANSWER_RIGHT = "Правильный ответ!"
+ANSWER_FALSE = "Неправильный ответ! Верный вариант: <span class='tg-spoiler'>{answer}</span>"
+RESULT_ATTEMPT = "Правильных ответов: {right}/{count}"
+RESTART_BUTTON = "Начать по-новой"

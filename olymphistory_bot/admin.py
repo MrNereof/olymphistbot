@@ -5,7 +5,10 @@ from olymphistory_bot.models import TelegramChat, TelegramUser, Epoch, Topic, Qu
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('text', 'type', 'epoch', 'topic')
+    list_filter = ('type', 'epoch', 'topic')
+
+    search_fields = ('text', 'answer')
 
 
 @admin.register(QuestionType)
