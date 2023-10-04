@@ -248,7 +248,7 @@ def send_question(bot: TelegramBot, update: Update, state: TelegramState):
     keyboard = []
     if data['tips']:
         keyboard = [[KeyboardButton.a(question.answer)]]
-        for q in get_questions(state).order_by('?').filter(type=question.type).exclude(id=question.id, answer=question.answer)[:2]:
+        for q in get_questions(state).order_by('?').filter(type=question.type).exclude(answer=question.answer)[:2]:
             keyboard.append([KeyboardButton.a(q.answer)])
         random.shuffle(keyboard)
 
