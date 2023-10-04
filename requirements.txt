@@ -1,4 +1,4 @@
-Django~=4.1
+Django==4.1
 django-tgbot==2.0.0
 Pillow==9.5.0
 django-jazzmin==2.6.0
