@@ -30,8 +30,8 @@ def get_questions(state: TelegramState):
     queryset = Question.objects.all()
 
     if data["epoch"] != "all":
-        queryset.filter(epoch=data["epoch"])
+        queryset = queryset.filter(epoch=data["epoch"])
     if data["topic"] != "all":
-        queryset.filter(topic=data["topic"])
+        queryset = queryset.filter(topic=data["topic"])
 
     return queryset

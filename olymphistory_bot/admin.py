@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from olymphistory_bot.models import TelegramChat, TelegramUser, Epoch, Topic, Question, QuestionType, Note
+from olymphistory_bot.models import TelegramChat, TelegramUser, Epoch, Topic, Question, QuestionType, Note, Attempt
+
+
+@admin.register(Attempt)
+class AttemptAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Question)

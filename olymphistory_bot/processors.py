@@ -1,9 +1,12 @@
+import random
+
 from django_tgbot.decorators import processor
 from django_tgbot.state_manager import message_types, update_types, state_types
 from django_tgbot.types.inlinekeyboardbutton import InlineKeyboardButton
 from django_tgbot.types.inlinekeyboardmarkup import InlineKeyboardMarkup
 from django_tgbot.types.keyboardbutton import KeyboardButton
 from django_tgbot.types.replykeyboardmarkup import ReplyKeyboardMarkup
+from django_tgbot.types.replykeyboardremove import ReplyKeyboardRemove
 from django_tgbot.types.update import Update
 
 from olymphistory_bot import messages
@@ -28,13 +31,13 @@ def message_processor(bot: TelegramBot, update: Update, state: TelegramState):
 def restart(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
     if callback_data == "restart":
-        chat_id = update.get_chat().get_id()
+        chat_id, _ = get_callback_message(update)
+
         send_start(bot, chat_id, state)
 
 
 def send_start(bot: TelegramBot, chat_id, state: TelegramState):
-    bot.sendMessage(chat_id,
-                    text=messages.START_MESSAGE,
+    bot.sendMessage(chat_id, text=messages.START_MESSAGE,
                     reply_markup=InlineKeyboardMarkup.a(
                         inline_keyboard=[
                             [
@@ -117,7 +120,6 @@ def send_topic_selection(bot: TelegramBot, update: Update, state: TelegramState)
         case _:
             ids = Topic.objects.filter(question__epoch_id=epoch_id).values_list("id", flat=True).distinct()
             queryset = Topic.objects.filter(id__in=ids)
-            print(queryset)
 
     keyboard = [
                    [InlineKeyboardButton.a(text="Все", callback_data="topic_all")]
@@ -204,7 +206,8 @@ def level_selection(bot: TelegramBot, update: Update, state: TelegramState):
     tips = text != messages.LEVEL_HARD
 
     count = get_questions(state).count()
-    bot.sendMessage(update.get_chat().get_id(), messages.NUMBER_OF_QUESTION.format(count=count), parse_mode="HTML")
+    bot.sendMessage(update.get_chat().get_id(), messages.NUMBER_OF_QUESTION.format(count=count),
+                    reply_markup=ReplyKeyboardRemove.a(remove_keyboard=True), parse_mode="HTML")
 
     state.update_memory({"tips": tips})
     state.set_name("num_of_question")
@@ -231,7 +234,7 @@ def num_of_question(bot: TelegramBot, update: Update, state: TelegramState):
         return
 
     attempt = Attempt.objects.create(user=state.telegram_user)
-    state.update_memory({"num": int(text), "already": 0, "attempt": attempt.id})
+    state.update_memory({"num": int(text), "already": 0, "attempt": attempt.id, "questions": []})
 
     send_question(bot, update, state)
 
@@ -242,9 +245,18 @@ def send_question(bot: TelegramBot, update: Update, state: TelegramState):
     attempt = Attempt.objects.get(id=data["attempt"])
     question = get_questions(state).exclude(attempt=attempt).order_by("?").first()
 
+    keyboard = []
+    if data['tips']:
+        keyboard = [[KeyboardButton.a(question.answer)]]
+        for q in get_questions(state).order_by('?').filter(type=question.type).exclude(id=question.id)[:2]:
+            keyboard.append([KeyboardButton.a(q.answer)])
+        random.shuffle(keyboard)
+
     send_with_image(bot, update.get_chat().get_id(),
                     text=messages.QUESTION.format(pos=data["already"] + 1, count=data["num"], text=question.text),
-                    image=question.image, parse_mode="HTML")
+                    image=question.image,
+                    reply_markup=ReplyKeyboardMarkup.a(keyboard=keyboard, resize_keyboard=True),
+                    parse_mode="HTML")
 
     state.update_memory({"question": question.id})
     state.set_name("question")
@@ -267,11 +279,13 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
 
     answer = UserAnswer(question=question, attempt=attempt, answer=text)
 
+    remove = dict(reply_markup=ReplyKeyboardRemove.a(remove_keyboard=True)) if data["already"] >= data["num"] else {}
+
     if text.lower() == question.answer.lower():
         answer.right = True
-        bot.sendMessage(chat_id, messages.ANSWER_RIGHT, parse_mode="HTML")
+        bot.sendMessage(chat_id, messages.ANSWER_RIGHT, parse_mode="HTML", **remove)
     else:
-        bot.sendMessage(chat_id, messages.ANSWER_FALSE.format(answer=question.answer), parse_mode="HTML")
+        bot.sendMessage(chat_id, messages.ANSWER_FALSE.format(answer=question.answer), parse_mode="HTML", **remove)
 
     answer.save()
 
@@ -280,6 +294,7 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
     else:
         right = UserAnswer.objects.filter(attempt=attempt, right=True).count()
         count = UserAnswer.objects.filter(attempt=attempt).count()
+
         bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count),
                         reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
                             [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")]]),

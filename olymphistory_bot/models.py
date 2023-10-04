@@ -108,6 +108,9 @@ class Attempt(models.Model):
     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, verbose_name="Пользователь")
     questions = models.ManyToManyField(Question, through="UserAnswer", verbose_name="Вопросы")
 
+    def __str__(self):
+        return f"{self.user} (№{self.id})"
+
 
 class UserAnswer(models.Model):
     attempt = models.ForeignKey(Attempt, on_delete=models.CASCADE)
