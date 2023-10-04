@@ -1,3 +1,5 @@
+import os
+
 # Do not remove these 2 lines:
-BOT_TOKEN = '6547911744:AAEcyX66Uz-oCPD3S0tity4PLSXgVsDrWog'  # You should consider using env variables or a secret manager for this.
-APP_NAME = 'olymphistory_bot'
+BOT_TOKEN = os.environ.get("BOT_TOKEN")  # You should consider using env variables or a secret manager for this.
+APP_NAME = os.environ.get("APP_NAME")
