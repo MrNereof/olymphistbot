@@ -195,7 +195,7 @@ def send_level_selection(bot: TelegramBot, update: Update, state: TelegramState)
     chat_id, _ = get_callback_message(update)
     bot.sendMessage(chat_id, messages.LEVEL_SELECT,
                     reply_markup=ReplyKeyboardMarkup.a(
-                        keyboard=[[KeyboardButton.a(messages.LEVEL_EASY), KeyboardButton.a(messages.LEVEL_HARD)]],
+                        keyboard=[[KeyboardButton.a(messages.LEVEL_EASY)], [KeyboardButton.a(messages.LEVEL_HARD)]],
                         one_time_keyboard=True), parse_mode="HTML")
 
     state.set_name("level_selection")
