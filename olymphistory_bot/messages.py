@@ -1,7 +1,7 @@
 START_MESSAGE = "<i>Привет! Чем хочешь заняться сегодня?</i>"
 TRAINING_BUTTON = "Тренироваться"
 
-SELECTION_MESSAGE = "Учить по эпохам или по темам:"
+SELECTION_MESSAGE = "<i>Учить по эпохам или по темам:</i>"
 SELECT_EPOCH_BUTTON = "Эпохи"
 SELECT_TOPIC_BUTTON = "Темы"
 SELECT_EPOCH = "Выберите эпоху:"
