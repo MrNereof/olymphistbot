@@ -305,8 +305,8 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
         
         bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
                         reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
-                            [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
                             [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")],
+                            [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
                         ]),
                         parse_mode="HTML")
         state.set_name("after_quiz")
