@@ -81,6 +81,9 @@ class Note(models.Model):
     image = models.ImageField(upload_to="notes", blank=True, null=True, verbose_name="Картинка")
     text = models.TextField(verbose_name="Текст")
 
+    def __str__(self):
+        return self.text
+
 
 class Question(models.Model):
     class Meta:
