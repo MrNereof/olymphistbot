@@ -231,19 +231,26 @@ def num_of_question(bot: TelegramBot, update: Update, state: TelegramState):
 
     if not text.isdigit():
         bot.sendMessage(chat_id, messages.INVALID_NUMBER, parse_mode="HTML")
-        level_selection(bot, update, state)
+        send_num_of_question_selection(bot, update, state)
         return
 
     count = get_questions(state).count()
     if int(text) > count:
         bot.sendMessage(chat_id, messages.MAX_NUMBER.format(count=count), parse_mode="HTML")
-        level_selection(bot, update, state)
+        send_num_of_question_selection(bot, update, state)
         return
 
     attempt = Attempt.objects.create(user=state.telegram_user)
     state.update_memory({"num": int(text), "already": 0, "attempt": attempt.id, "questions": []})
 
     send_question(bot, update, state)
+
+
+def send_num_of_question_selection(bot: TelegramBot, update: Update, state: TelegramState):
+    count = get_questions(state).count()
+    bot.editMessageText(update.get_chat().get_id(), messages.NUMBER_OF_QUESTION.format(count=count), parse_mode="HTML")
+
+    state.set_name("num_of_question")
 
 
 def send_question(bot: TelegramBot, update: Update, state: TelegramState):
