@@ -11,7 +11,7 @@ SELECT_TOPIC = "Выберите тему:<"
 YOU_HAVE_EPOCH_SELECTED = "<b>Вы выбрали следующую эпоху:</b>"
 YOU_HAVE_TOPIC_SELECTED = "<b>Вы выбрали следующую тему:</b>"
 SELECTED = "<b>{title}</b>\n\n<i>{description}</i>\n"
-SELECTED_ALL = "<b>Все</b>"
+SELECTED_TITLE = "<b>{title}</b>"
 
 LEVEL_SELECT = "Выберите уровень сложности:"
 LEVEL_EASY = "Простой"

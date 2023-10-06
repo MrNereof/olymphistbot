@@ -173,14 +173,20 @@ def send_selected(bot: TelegramBot, update: Update, state: TelegramState, callba
     if callback_data != "all":
         obj_id = int(callback_data)
         obj = model.objects.get(id=obj_id)
+
+        if obj.description:
+            text = messages.SELECTED.format(title=str(obj), description=obj.description)
+        else:
+            text = messages.SELECTED_TITLE.format(title=str(obj))
+
         send_with_image(bot, chat_id,
-                        text=messages.SELECTED.format(title=str(obj), description=obj.description),
+                        text=text,
                         image=obj.image,
                         parse_mode="HTML")
 
         state.update_memory({name: obj_id})
     else:
-        bot.sendMessage(chat_id, messages.SELECTED_ALL, parse_mode="HTML")
+        bot.sendMessage(chat_id, messages.SELECTED_TITLE.format(title="Все"), parse_mode="HTML")
 
         state.update_memory({name: callback_data})
 
