@@ -1,5 +1,3 @@
-import random
-
 from django_tgbot.decorators import processor
 from django_tgbot.state_manager import message_types, update_types, state_types
 from django_tgbot.types.inlinekeyboardbutton import InlineKeyboardButton
@@ -12,8 +10,10 @@ from django_tgbot.types.update import Update
 from olymphistory_bot import messages
 from .bot import TelegramBot
 from .bot import state_manager
-from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer
+from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer, Note
 from .utils import get_callback_message, send_with_image, get_questions
+
+import random
 
 
 @processor(state_manager, update_types=update_types.Message,
@@ -27,7 +27,7 @@ def message_processor(bot: TelegramBot, update: Update, state: TelegramState):
             send_start(bot, chat_id, state)
 
 
-@processor(state_manager, update_types=[update_types.CallbackQuery], from_states=state_types.All)
+@processor(state_manager, update_types=update_types.CallbackQuery, from_states=state_types.All)
 def restart(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
     if callback_data == "restart":
@@ -49,7 +49,7 @@ def send_start(bot: TelegramBot, chat_id, state: TelegramState):
     state.set_name("started")
 
 
-@processor(state_manager, from_states="started", update_types=[update_types.CallbackQuery])
+@processor(state_manager, from_states="started", update_types=update_types.CallbackQuery)
 def handle_started(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
     match callback_data:
@@ -71,7 +71,7 @@ def handle_training(bot: TelegramBot, update: Update, state: TelegramState):
     state.set_name("topic_or_epochs")
 
 
-@processor(state_manager, from_states="topic_or_epochs", update_types=[update_types.CallbackQuery])
+@processor(state_manager, from_states="topic_or_epochs", update_types=update_types.CallbackQuery)
 def handle_selection(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
     match callback_data:
@@ -139,7 +139,7 @@ def send_topic_selection(bot: TelegramBot, update: Update, state: TelegramState)
     state.set_name("theme_selected")
 
 
-@processor(state_manager, from_states="theme_selected", update_types=[update_types.CallbackQuery])
+@processor(state_manager, from_states="theme_selected", update_types=update_types.CallbackQuery)
 def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
 
@@ -301,9 +301,52 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
         right = UserAnswer.objects.filter(attempt=attempt, right=True).count()
         count = UserAnswer.objects.filter(attempt=attempt).count()
 
-        bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count),
+        bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count), parse_mode="HTML")
+        
+        bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
                         reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
-                            [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")]]),
+                            [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
+                            [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")],
+                        ]),
                         parse_mode="HTML")
-        state.reset_memory()
-        state.set_name("started")
+        state.set_name("after_quiz")
+
+
+@processor(state_manager, from_states="after_quiz", update_types=update_types.CallbackQuery)
+def handle_after_quiz(bot: TelegramBot, update: Update, state: TelegramState):
+    callback_data = update.get_callback_query().get_data()
+    match callback_data:
+        case "training":
+            handle_training(bot, update, state)
+        case "show_notes":
+            handle_notes(bot, update, state)
+
+
+def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
+    chat_id, message_id = get_callback_message(update)
+
+    data = state.get_memory()
+
+    attempt = Attempt.objects.get(id=data["attempt"])
+    notes = Note.objects.filter(question__attempt=attempt, question__useranswer__right=False)
+
+    if not notes.exists():
+        bot.answerCallbackQuery(update.get_callback_query().get_id(), messages.NO_NOTES_ERROR)
+        return
+
+    bot.editMessageText(messages.NOTE_TEXT, chat_id=chat_id, message_id=message_id, parse_mode="HTML")
+
+    for note in notes:
+        questions = note.question_set.filter(attempt=attempt)
+        text_questions = "\n".join([messages.QUESTIONS_IN_NOTE.format(question=str(question)) for question in questions])
+
+        send_with_image(bot, update.get_chat().get_id(),
+                        text=messages.NOTE.format(text=note.text, questions=text_questions),
+                        image=note.image,
+                        parse_mode="HTML")
+
+    bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
+                    reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
+                        [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
+                    ]),
+                    parse_mode="HTML")

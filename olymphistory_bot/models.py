@@ -78,6 +78,7 @@ class Note(models.Model):
         verbose_name = "Шпаргалка"
         verbose_name_plural = "Шпаргалки"
 
+    image = models.ImageField(upload_to="notes", blank=True, null=True, verbose_name="Картинка")
     text = models.TextField(verbose_name="Текст")
 
 
