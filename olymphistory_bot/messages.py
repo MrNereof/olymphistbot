@@ -4,8 +4,8 @@ TRAINING_BUTTON = "Тренироваться"
 SELECTION_MESSAGE = "<i>Учить по эпохам или по темам:</i>"
 SELECT_EPOCH_BUTTON = "Эпохи"
 SELECT_TOPIC_BUTTON = "Темы"
-SELECT_EPOCH = "<i>Выберите эпоху:</i>"
-SELECT_TOPIC = "<i>Выберите тему:</i>"
+SELECT_EPOCH = "Выберите эпоху:"
+SELECT_TOPIC = "Выберите тему:"
 
 
 YOU_HAVE_EPOCH_SELECTED = "<b>Вы выбрали следующую эпоху:</b>"
@@ -13,11 +13,11 @@ YOU_HAVE_TOPIC_SELECTED = "<b>Вы выбрали следующую тему:</
 SELECTED = "<b>{title}</b>\n\n<i>{description}</i>\n"
 SELECTED_TITLE = "<b>{title}</b>"
 
-LEVEL_SELECT = "<i>Выберите уровень сложности:</i>"
+LEVEL_SELECT = "Выберите уровень сложности:"
 LEVEL_EASY = "Простой"
 LEVEL_HARD = "Сложный"
 
-NUMBER_OF_QUESTION = "<i>Сколько вопросов вы хотите пройти (всего <b>{count}<b>):</i>"
+NUMBER_OF_QUESTION = "Сколько вопросов вы хотите пройти (всего <b>{count}</b>):"
 INVALID_NUMBER = "<i>Введёно недействительное число! Пожалуйста, попробуйте снова.</i>"
 MAX_NUMBER = "<i>Всего <b>{count}</b> вопросов по теме. Пожалуйста, попробуйте снова.</i>"
 
