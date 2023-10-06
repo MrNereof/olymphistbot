@@ -194,26 +194,25 @@ def send_selected(bot: TelegramBot, update: Update, state: TelegramState, callba
 def send_level_selection(bot: TelegramBot, update: Update, state: TelegramState):
     chat_id, _ = get_callback_message(update)
     bot.sendMessage(chat_id, messages.LEVEL_SELECT,
-                    reply_markup=ReplyKeyboardMarkup.a(
-                        keyboard=[[KeyboardButton.a(messages.LEVEL_EASY)], [KeyboardButton.a(messages.LEVEL_HARD)]],
-                        one_time_keyboard=True), parse_mode="HTML")
+                    reply_markup=InlineKeyboardMarkup.a(
+                        inline_keyboard=[[InlineKeyboardButton.a(text=messages.LEVEL_EASY, callback_data="easy"),
+                                          InlineKeyboardButton.a(text=messages.LEVEL_HARD, callback_data="hard")]]),
+                    parse_mode="HTML")
 
     state.set_name("level_selection")
 
 
-@processor(state_manager, update_types=update_types.Message,
-           message_types=message_types.Text, from_states="level_selection")
+@processor(state_manager, from_states="level_selection", update_types=update_types.CallbackQuery)
 def level_selection(bot: TelegramBot, update: Update, state: TelegramState):
-    text = update.get_message().get_text()
+    chat_id, message_id = get_callback_message(update)
 
-    if text == "/start":
-        return
+    callback_data = update.get_callback_query().get_data()
 
-    tips = text != messages.LEVEL_HARD
+    tips = callback_data == "easy"
 
     count = get_questions(state).count()
-    bot.sendMessage(update.get_chat().get_id(), messages.NUMBER_OF_QUESTION.format(count=count),
-                    reply_markup=ReplyKeyboardRemove.a(remove_keyboard=True), parse_mode="HTML")
+    bot.editMessageText(messages.NUMBER_OF_QUESTION.format(count=count), chat_id=chat_id, message_id=message_id,
+                        reply_markup=ReplyKeyboardRemove.a(remove_keyboard=True), parse_mode="HTML")
 
     state.update_memory({"tips": tips})
     state.set_name("num_of_question")
@@ -302,7 +301,7 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
         count = UserAnswer.objects.filter(attempt=attempt).count()
 
         bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count), parse_mode="HTML")
-        
+
         bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
                         reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
                             [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")],
@@ -328,7 +327,8 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
     data = state.get_memory()
 
     attempt = Attempt.objects.get(id=data["attempt"])
-    note_ids = Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).values_list("id", flat=True).distinct()
+    note_ids = Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).values_list("id",
+                                                                                                             flat=True).distinct()
 
     if not note_ids.exists():
         bot.answerCallbackQuery(update.get_callback_query().get_id(), messages.NO_NOTES_ERROR)
@@ -338,7 +338,8 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
 
     for note in Note.objects.filter(id__in=note_ids):
         questions = note.question_set.filter(attempt=attempt)
-        text_questions = "\n".join([messages.QUESTIONS_IN_NOTE.format(question=question.text) for question in questions])
+        text_questions = "\n".join(
+            [messages.QUESTIONS_IN_NOTE.format(question=question.text) for question in questions])
 
         send_with_image(bot, update.get_chat().get_id(),
                         text=messages.NOTE.format(text=note.text, questions=text_questions),
