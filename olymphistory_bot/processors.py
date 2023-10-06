@@ -212,7 +212,7 @@ def level_selection(bot: TelegramBot, update: Update, state: TelegramState):
 
     count = get_questions(state).count()
     bot.editMessageText(messages.NUMBER_OF_QUESTION.format(count=count), chat_id=chat_id, message_id=message_id,
-                        reply_markup=ReplyKeyboardRemove.a(remove_keyboard=True), parse_mode="HTML")
+                        parse_mode="HTML")
 
     state.update_memory({"tips": tips})
     state.set_name("num_of_question")
