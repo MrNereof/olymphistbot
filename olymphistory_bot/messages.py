@@ -5,12 +5,12 @@ SELECTION_MESSAGE = "Учить по эпохам или по темам?"
 SELECT_EPOCH_BUTTON = "Эпохи"
 SELECT_TOPIC_BUTTON = "Темы"
 SELECT_EPOCH = "Выберите эпоху:"
-SELECT_TOPIC = "Выберите тему:"
+SELECT_TOPIC = "Выберите тему:<"
 
 
-YOU_HAVE_EPOCH_SELECTED = "Вы выбрали следующую эпоху:"
-YOU_HAVE_TOPIC_SELECTED = "Вы выбрали следующую тему:"
-SELECTED = "<b>{title}</b>\n<i>{description}</i>\n<b>===========</b>"
+YOU_HAVE_EPOCH_SELECTED = "<b>Вы выбрали следующую эпоху:</b>"
+YOU_HAVE_TOPIC_SELECTED = "<b>Вы выбрали следующую тему:</b>"
+SELECTED = "<b>{title}</b>\n\n<i>{description}</i>\n"
 SELECTED_ALL = "<b>Все</b>"
 
 LEVEL_SELECT = "Выберите уровень сложности:"
