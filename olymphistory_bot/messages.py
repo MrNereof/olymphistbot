@@ -1,7 +1,7 @@
 START_MESSAGE = "<i>Привет! Чем хочешь заняться сегодня?</i>"
 TRAINING_BUTTON = "Тренироваться"
 
-SELECTION_MESSAGE = "<i>Учить по эпохам или по темам:</i>"
+SELECTION_MESSAGE = "Учить по эпохам или по темам:"
 SELECT_EPOCH_BUTTON = "Эпохи"
 SELECT_TOPIC_BUTTON = "Темы"
 SELECT_EPOCH = "Выберите эпоху:"
@@ -26,7 +26,7 @@ ANSWER_RIGHT = "<b>✅Правильный ответ!</b>"
 ANSWER_FALSE = "<b>❌Неправильный ответ! Верный вариант:</b>\n<span class='tg-spoiler'>{answer}</span>"
 RESULT_ATTEMPT = "<b>Правильных ответов:</b> {right}/{count}"
 
-ACTIONS_TEXT = "<i>Чем хочешь заняться дальше?</i>"
+ACTIONS_TEXT = "<i>Чем займёмся дальше?</i>"
 RESTART_BUTTON = "Начать по-новой"
 NOTES_BUTTON = "Посмотреть заметки по ошибкам"
 NO_NOTES_ERROR = "Заметок не найдено!"
