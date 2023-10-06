@@ -328,17 +328,17 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
     data = state.get_memory()
 
     attempt = Attempt.objects.get(id=data["attempt"])
-    notes = Note.objects.filter(question__attempt=attempt, question__useranswer__right=False)
+    note_ids = Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).values_list("id", flat=True).distinct()
 
-    if not notes.exists():
+    if not note_ids.exists():
         bot.answerCallbackQuery(update.get_callback_query().get_id(), messages.NO_NOTES_ERROR)
         return
 
     bot.editMessageText(messages.NOTE_TEXT, chat_id=chat_id, message_id=message_id, parse_mode="HTML")
 
-    for note in notes:
+    for note in Note.objects.filter(id__in=note_ids):
         questions = note.question_set.filter(attempt=attempt)
-        text_questions = "\n".join([messages.QUESTIONS_IN_NOTE.format(question=str(question)) for question in questions])
+        text_questions = "\n".join([messages.QUESTIONS_IN_NOTE.format(question=question.text) for question in questions])
 
         send_with_image(bot, update.get_chat().get_id(),
                         text=messages.NOTE.format(text=note.text, questions=text_questions),
