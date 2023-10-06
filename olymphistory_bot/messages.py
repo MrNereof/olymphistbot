@@ -24,11 +24,11 @@ MAX_NUMBER = "<i>Всего {count} вопросов по теме. Пожалу
 QUESTION = "<b>Вопрос {pos}/{count}:</b>\n<i>{text}</i>"
 ANSWER_RIGHT = "<b>✅Правильный ответ!</b>"
 ANSWER_FALSE = "<b>❌Неправильный ответ! Верный вариант:</b>\n<span class='tg-spoiler'>{answer}</span>"
-RESULT_ATTEMPT = "<b>Правильных ответов:</b> <i>{right}/{count}</i>"
+RESULT_ATTEMPT = "<b>Правильных ответов:</b> {right}/{count}"
 
 ACTIONS_TEXT = "Чем хочешь заняться дальше?"
 RESTART_BUTTON = "Начать по-новой"
-NOTES_BUTTON = "Заметки по ошибкам"
+NOTES_BUTTON = "Посмотреть заметки по ошибкам"
 NO_NOTES_ERROR = "Заметок не найдено!"
 
 NOTE_TEXT = "Заметки по ошибкам:"
