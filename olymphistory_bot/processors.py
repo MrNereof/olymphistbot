@@ -58,6 +58,8 @@ def handle_started(bot: TelegramBot, update: Update, state: TelegramState):
 
 
 def handle_training(bot: TelegramBot, update: Update, state: TelegramState):
+    state.reset_memory()
+
     chat_id, message_id = get_callback_message(update)
 
     bot.editMessageText(messages.SELECTION_MESSAGE, chat_id=chat_id, message_id=message_id,
