@@ -304,11 +304,11 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
 
         bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count), parse_mode="HTML")
 
-        bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
-                        reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
-                            [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")],
-                            [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
-                        ]),
+        keyboard = [[InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")]]
+        if Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).exists():
+            keyboard.insert(0, [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")])
+
+        bot.sendMessage(chat_id, messages.ACTIONS_TEXT, reply_markup=InlineKeyboardMarkup.a(inline_keyboard=keyboard),
                         parse_mode="HTML")
         state.set_name("after_quiz")
 
