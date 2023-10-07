@@ -241,7 +241,7 @@ def num_of_question(bot: TelegramBot, update: Update, state: TelegramState):
         return
 
     attempt = Attempt.objects.create(user=state.telegram_user)
-    state.update_memory({"num": int(text), "already": 0, "attempt": attempt.id, "questions": []})
+    state.update_memory({"num": int(text), "already": 0, "attempt": attempt.id})
 
     send_question(bot, update, state)
 
@@ -311,7 +311,8 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
 
         bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count), parse_mode="HTML")
 
-        keyboard = [[InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")]]
+        keyboard = [[InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
+                    [InlineKeyboardButton.a(text=messages.RETRY_BUTTON, callback_data="retry")]]
         if Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).exists():
             keyboard.insert(0, [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")])
 
@@ -326,8 +327,17 @@ def handle_after_quiz(bot: TelegramBot, update: Update, state: TelegramState):
     match callback_data:
         case "training":
             handle_training(bot, update, state)
+        case "retry":
+            handle_retry(bot, update, state)
         case "show_notes":
             handle_notes(bot, update, state)
+
+
+def handle_retry(bot: TelegramBot, update: Update, state: TelegramState):
+    attempt = Attempt.objects.create(user=state.telegram_user)
+    state.update_memory({"already": 0, "attempt": attempt.id})
+
+    send_question(bot, update, state)
 
 
 def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
