@@ -82,7 +82,7 @@ class Note(models.Model):
     text = models.TextField(verbose_name="Текст")
 
     def __str__(self):
-        return self.text
+        return self.text.splitlines()[0]
 
 
 class Question(models.Model):
