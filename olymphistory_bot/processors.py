@@ -334,8 +334,12 @@ def handle_after_quiz(bot: TelegramBot, update: Update, state: TelegramState):
 
 
 def handle_retry(bot: TelegramBot, update: Update, state: TelegramState):
+    chat_id, message_id = get_callback_message(update)
+
     attempt = Attempt.objects.create(user=state.telegram_user)
     state.update_memory({"already": 0, "attempt": attempt.id})
+
+    bot.deleteMessage(chat_id, message_id)
 
     send_question(bot, update, state)
 
@@ -356,7 +360,7 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
     bot.editMessageText(messages.NOTE_TEXT, chat_id=chat_id, message_id=message_id, parse_mode="HTML")
 
     for note in Note.objects.filter(id__in=note_ids):
-        questions = note.question_set.filter(attempt=attempt)
+        questions = note.question_set.filter(attempt=attempt, useranswer__right=False)
         text_questions = "\n".join(
             [messages.QUESTIONS_IN_NOTE.format(question=question.text,
                                                answer=UserAnswer.objects.get(attempt=attempt, question=question).answer)
@@ -370,5 +374,6 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
     bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
                     reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
                         [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
+                        [InlineKeyboardButton.a(text=messages.RETRY_BUTTON, callback_data="retry")],
                     ]),
                     parse_mode="HTML")
