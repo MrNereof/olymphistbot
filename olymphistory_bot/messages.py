@@ -32,5 +32,5 @@ NOTES_BUTTON = "Посмотреть заметки по ошибкам"
 NO_NOTES_ERROR = "Заметок не найдено!"
 
 NOTE_TEXT = "<i>Заметки по ошибкам:</i>"
-NOTE = "{text}\n\n{questions}"
-QUESTIONS_IN_NOTE = "<i>{question}</i>"
+NOTE = "{text}\n\n<b>============</b>\n{questions}"
+QUESTIONS_IN_NOTE = "<i>❌{question}</i> - <b>{answer}</b>"

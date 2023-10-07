@@ -1,3 +1,5 @@
+import random
+
 from django_tgbot.decorators import processor
 from django_tgbot.state_manager import message_types, update_types, state_types
 from django_tgbot.types.inlinekeyboardbutton import InlineKeyboardButton
@@ -12,8 +14,6 @@ from .bot import TelegramBot
 from .bot import state_manager
 from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer, Note
 from .utils import get_callback_message, send_with_image, get_questions
-
-import random
 
 
 @processor(state_manager, update_types=update_types.Message,
@@ -348,7 +348,9 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
     for note in Note.objects.filter(id__in=note_ids):
         questions = note.question_set.filter(attempt=attempt)
         text_questions = "\n".join(
-            [messages.QUESTIONS_IN_NOTE.format(question=question.text) for question in questions])
+            [messages.QUESTIONS_IN_NOTE.format(question=question.text,
+                                               answer=UserAnswer.objects.get(attempt=attempt, question=question).answer)
+             for question in questions])
 
         send_with_image(bot, update.get_chat().get_id(),
                         text=messages.NOTE.format(text=note.text, questions=text_questions),
