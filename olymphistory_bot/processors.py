@@ -372,7 +372,7 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
         questions = note.question_set.filter(attempt=attempt, useranswer__right=False)
         text_questions = "\n".join(
             [messages.QUESTIONS_IN_NOTE.format(question=question.text,
-                                               answer=UserAnswer.objects.get(attempt=attempt, question=question).answer)
+                                               answer=question.answer)
              for question in questions])
 
         send_with_image(bot, update.get_chat().get_id(),
