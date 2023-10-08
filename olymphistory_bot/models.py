@@ -38,8 +38,6 @@ class Epoch(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание")
     image = models.ImageField(upload_to="epochs", blank=True, null=True, verbose_name="Картинка")
 
-    emoji = models.CharField(max_length=25, blank=True, verbose_name="Эмодзи")
-
     position = models.IntegerField(null=True, blank=True, verbose_name="Позиция")
 
     def __str__(self):
@@ -47,8 +45,8 @@ class Epoch(models.Model):
         end = self.end_year if self.end_year is not None else "..."
 
         if start == end:
-            return f"{self.emoji}{self.name}"
-        return f"{self.emoji}{self.name} ({start} — {end})"
+            return self.name
+        return f"{self.name} ({start} — {end})"
 
 
 class Topic(models.Model):
