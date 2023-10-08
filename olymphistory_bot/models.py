@@ -47,8 +47,8 @@ class Epoch(models.Model):
         end = self.end_year if self.end_year is not None else "..."
 
         if start == end:
-            return self.name
-        return f"{self.name} ({start} — {end})"
+            return f"{self.emoji}{self.name}{self.emoji}"
+        return f"{self.emoji}{self.name} ({start} — {end}){self.emoji}"
 
 
 class Topic(models.Model):
