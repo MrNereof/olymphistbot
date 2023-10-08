@@ -91,8 +91,8 @@ class Question(models.Model):
         verbose_name_plural = "Вопросы"
 
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE, verbose_name="Тип")
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, verbose_name="Тема")
-    epoch = models.ForeignKey(Epoch, on_delete=models.CASCADE, verbose_name="Эпоха")
+    topic = models.ForeignKey(Topic, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Тема")
+    epoch = models.ForeignKey(Epoch, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Эпоха")
 
     image = models.ImageField(upload_to="questions", blank=True, null=True, verbose_name="Картинка")
     text = models.TextField(verbose_name="Текст вопроса")
