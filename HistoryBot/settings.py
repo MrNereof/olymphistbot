@@ -97,6 +97,10 @@ if os.environ.get('DB_TYPE', 'sqlite') == 'mysql':
             'PASSWORD': os.environ.get('MYSQL_PASSWORD', None),
             'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
             'PORT': os.environ.get('MYSQL_PORT', '3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'use_unicode': True,
+            }
         }
     }
 else:
