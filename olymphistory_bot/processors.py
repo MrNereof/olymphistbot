@@ -149,18 +149,26 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
         case callback_data if callback_data.startswith("epoch_"):
             epoch = callback_data.replace("epoch_", "")
 
-            send_selected(bot, update, state, epoch, messages.YOU_HAVE_EPOCH_SELECTED, Epoch, "epoch")
+            obj = send_selected(bot, update, state, epoch, messages.YOU_HAVE_EPOCH_SELECTED, Epoch, "epoch")
+
+            if Topic.objects.filter(question__epoch=obj).values_list("id", flat=True).distinct().count() <= 1:
+                state.update_memory({"topic": "all"})
 
             if "topic" not in state.get_memory():
                 send_topic_selection(bot, update, state)
+                return
 
         case callback_data if callback_data.startswith("topic_"):
             topic = callback_data.replace("topic_", "")
 
-            send_selected(bot, update, state, topic, messages.YOU_HAVE_TOPIC_SELECTED, Topic, "topic")
+            obj = send_selected(bot, update, state, topic, messages.YOU_HAVE_TOPIC_SELECTED, Topic, "topic")
+
+            if Epoch.objects.filter(question__topic=obj).values_list("id", flat=True).distinct().count() <= 1:
+                state.update_memory({"epoch": "all"})
 
             if "epoch" not in state.get_memory():
                 send_epoch_selection(bot, update, state)
+                return
 
     data = state.get_memory()
     if "epoch" in data and "topic" in data:
@@ -187,6 +195,7 @@ def send_selected(bot: TelegramBot, update: Update, state: TelegramState, callba
                         parse_mode="HTML")
 
         state.update_memory({name: obj_id})
+        return obj
     else:
         bot.sendMessage(chat_id, messages.SELECTED_TITLE.format(title="Все"), parse_mode="HTML")
 
