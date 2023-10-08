@@ -38,7 +38,7 @@ class Epoch(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание")
     image = models.ImageField(upload_to="epochs", blank=True, null=True, verbose_name="Картинка")
 
-    emoji = models.CharField(max_length=1, blank=True, verbose_name="Эмодзи")
+    emoji = models.CharField(max_length=25, blank=True, verbose_name="Эмодзи")
 
     position = models.IntegerField(null=True, blank=True, verbose_name="Позиция")
 
