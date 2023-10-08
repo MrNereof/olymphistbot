@@ -27,9 +27,9 @@ ANSWER_FALSE = "<b>❌Неправильный ответ! Верный вари
 RESULT_ATTEMPT = "<b>Правильных ответов:</b> {right}/{count}"
 
 ACTIONS_TEXT = "<i>Чем займёмся дальше?</i>"
-RESTART_BUTTON = "Начать по-новой"
+RESTART_BUTTON = "На главную"
 RETRY_BUTTON = "Повторить"
-NOTES_BUTTON = "Посмотреть заметки по ошибкам"
+NOTES_BUTTON = "❗️Посмотреть заметки по ошибкам❗️"
 NO_NOTES_ERROR = "Заметок не найдено!"
 
 NOTE_TEXT = "<i>Заметки по ошибкам:</i>"
