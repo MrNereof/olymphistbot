@@ -96,7 +96,7 @@ def send_epoch_selection(bot: TelegramBot, update: Update, state: TelegramState)
             queryset = Epoch.objects.filter(id__in=ids)
 
     keyboard = [[InlineKeyboardButton.a(text="Все", callback_data="epoch_all")]] + [
-        [InlineKeyboardButton.a(text=str(epoch), callback_data=f"epoch_{epoch.id}")] for epoch in queryset
+        [InlineKeyboardButton.a(text=f"{epoch.emoji}{str(epoch)}", callback_data=f"epoch_{epoch.id}")] for epoch in queryset
     ]
 
     if topic_id:
