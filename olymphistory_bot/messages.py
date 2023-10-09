@@ -34,4 +34,4 @@ NO_NOTES_ERROR = "Заметок не найдено!"
 
 NOTE_TEXT = "<i>Заметки по ошибкам:</i>"
 NOTE = "{text}\n\n<b>============</b>\n{questions}"
-QUESTIONS_IN_NOTE = "<i>❌{question}</i> - <b>{answer}</b>"
+QUESTIONS_IN_NOTE = "<i>❌{question}</i> - <s>{answer}</s> <b>{right}</b>"

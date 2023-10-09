@@ -13,7 +13,7 @@ from olymphistory_bot import messages
 from .bot import TelegramBot
 from .bot import state_manager
 from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer, Note
-from .utils import get_callback_message, send_with_image, get_questions
+from .utils import get_callback_message, send_with_image, get_questions, process_answer
 
 
 @processor(state_manager, update_types=update_types.Message,
@@ -304,7 +304,7 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
 
     remove = dict(reply_markup=ReplyKeyboardRemove.a(remove_keyboard=True)) if data["already"] >= data["num"] else {}
 
-    if text.lower() == question.answer.lower():
+    if process_answer(text) == process_answer(question.answer):
         answer.right = True
         bot.sendMessage(chat_id, messages.ANSWER_RIGHT, parse_mode="HTML", **remove)
     else:
@@ -372,7 +372,8 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
         questions = note.question_set.filter(attempt=attempt, useranswer__right=False)
         text_questions = "\n".join(
             [messages.QUESTIONS_IN_NOTE.format(question=question.text,
-                                               answer=question.answer)
+                                               answer=UserAnswer.objects.get(attempt=attempt, question=question).answer,
+                                               right=question.answer)
              for question in questions])
 
         send_with_image(bot, update.get_chat().get_id(),

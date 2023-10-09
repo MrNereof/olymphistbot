@@ -35,3 +35,7 @@ def get_questions(state: TelegramState):
         queryset = queryset.filter(topic=data["topic"])
 
     return queryset
+
+
+def process_answer(answer: str) -> str:
+    return answer.lower().replace("ё", "е")
