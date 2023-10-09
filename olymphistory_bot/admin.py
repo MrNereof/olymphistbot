@@ -5,7 +5,8 @@ from olymphistory_bot.models import TelegramChat, TelegramUser, Epoch, Topic, Qu
 
 @admin.register(Attempt)
 class AttemptAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'user')
+    list_filter = ('user', )
 
 
 @admin.register(Question)
