@@ -244,13 +244,19 @@ def num_of_question(bot: TelegramBot, update: Update, state: TelegramState):
         return
 
     count = get_questions(state).count()
-    if int(text) > count:
+    num = int(text)
+
+    if num < 1:
+        send_start(bot, update, state)
+        return
+
+    if num > count:
         bot.sendMessage(chat_id, messages.MAX_NUMBER.format(count=count), parse_mode="HTML")
         send_num_of_question_selection(bot, update, state)
         return
 
     attempt = Attempt.objects.create(user=state.telegram_user)
-    state.update_memory({"num": int(text), "already": 0, "attempt": attempt.id})
+    state.update_memory({"num": num, "already": 0, "attempt": attempt.id})
 
     send_question(bot, update, state)
 
