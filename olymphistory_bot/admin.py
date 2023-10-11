@@ -11,7 +11,7 @@ class AttemptAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'type', 'epoch', 'topic')
+    list_display = ('text', 'type', 'epoch', 'topic', 'answer')
     list_filter = ('type', 'epoch', 'topic', 'note')
 
     search_fields = ('text', 'answer')
