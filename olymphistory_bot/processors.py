@@ -151,24 +151,24 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
 
             obj = send_selected(bot, update, state, epoch, messages.YOU_HAVE_EPOCH_SELECTED, Epoch, "epoch")
 
-            if Topic.objects.filter(question__epoch=obj).values_list("id", flat=True).distinct().count() <= 1:
-                state.update_memory({"topic": "all"})
-
             if "topic" not in state.get_memory():
-                send_topic_selection(bot, update, state)
-                return
+                if Topic.objects.filter(question__epoch=obj).values_list("id", flat=True).distinct().count() <= 1:
+                    state.update_memory({"topic": "all"})
+                else:
+                    send_topic_selection(bot, update, state)
+                    return
 
         case callback_data if callback_data.startswith("topic_"):
             topic = callback_data.replace("topic_", "")
 
             obj = send_selected(bot, update, state, topic, messages.YOU_HAVE_TOPIC_SELECTED, Topic, "topic")
 
-            if Epoch.objects.filter(question__topic=obj).values_list("id", flat=True).distinct().count() <= 1:
-                state.update_memory({"epoch": "all"})
-
             if "epoch" not in state.get_memory():
-                send_epoch_selection(bot, update, state)
-                return
+                if Epoch.objects.filter(question__topic=obj).values_list("id", flat=True).distinct().count() <= 1:
+                    state.update_memory({"epoch": "all"})
+                else:
+                    send_epoch_selection(bot, update, state)
+                    return
 
     data = state.get_memory()
     if "epoch" in data and "topic" in data:
