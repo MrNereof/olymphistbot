@@ -152,7 +152,7 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
             obj = send_selected(bot, update, state, epoch, messages.YOU_HAVE_EPOCH_SELECTED, Epoch, "epoch")
 
             if "topic" not in state.get_memory():
-                if Topic.objects.filter(question__epoch=obj).values_list("id", flat=True).distinct().count() <= 1:
+                if obj and Topic.objects.filter(question__epoch=obj).values_list("id", flat=True).distinct().count() <= 1:
                     state.update_memory({"topic": "all"})
                 else:
                     send_topic_selection(bot, update, state)
@@ -164,7 +164,7 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
             obj = send_selected(bot, update, state, topic, messages.YOU_HAVE_TOPIC_SELECTED, Topic, "topic")
 
             if "epoch" not in state.get_memory():
-                if Epoch.objects.filter(question__topic=obj).values_list("id", flat=True).distinct().count() <= 1:
+                if obj and Epoch.objects.filter(question__topic=obj).values_list("id", flat=True).distinct().count() <= 1:
                     state.update_memory({"epoch": "all"})
                 else:
                     send_epoch_selection(bot, update, state)
