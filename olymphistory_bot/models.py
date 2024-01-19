@@ -116,7 +116,7 @@ class Question(models.Model):
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE, verbose_name="Тип")
     topic = models.ForeignKey(Topic, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Тема")
     epoch = models.ForeignKey(Epoch, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Эпоха")
-    leader = models.ForeignKey(Leader, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Эпоха")
+    leader = models.ForeignKey(Leader, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Правитель")
 
     image = models.ImageField(upload_to="questions", blank=True, null=True, verbose_name="Картинка")
     text = models.TextField(verbose_name="Текст вопроса")
