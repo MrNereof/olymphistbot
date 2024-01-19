@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from olymphistory_bot.models import TelegramChat, TelegramUser, Epoch, Topic, Question, QuestionType, Note, Attempt
+from olymphistory_bot.models import TelegramChat, TelegramUser, Epoch, Topic, Question, QuestionType, Note, Attempt, Leader
 
 
 @admin.register(Attempt)
@@ -11,8 +11,8 @@ class AttemptAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'type', 'epoch', 'topic', 'answer')
-    list_filter = ('type', 'epoch', 'topic', 'note')
+    list_display = ('text', 'type', 'epoch', 'topic', 'leader', 'answer')
+    list_filter = ('type', 'epoch', 'topic', 'leader', 'note')
 
     search_fields = ('text', 'answer')
 
@@ -34,6 +34,11 @@ class TopicAdmin(admin.ModelAdmin):
 
 @admin.register(Epoch)
 class EpochAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Leader)
+class LeaderAdmin(admin.ModelAdmin):
     pass
 
 
