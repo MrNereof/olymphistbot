@@ -29,13 +29,21 @@ def get_questions(state: TelegramState):
 
     queryset = Question.objects.all()
 
-    if data["epoch"] != "all":
+    if "leader" in data:
+        queryset = queryset.filter(leader=data["leader"])
+
+    if data.get("epoch", "all") != "all":
         queryset = queryset.filter(epoch=data["epoch"])
-    if data["topic"] != "all":
+    if data.get("topic", "all") != "all":
         queryset = queryset.filter(topic=data["topic"])
 
     return queryset
 
 
 def process_answer(answer: str) -> str:
-    return answer.lower().replace("ё", "е")
+    return answer.lower().replace("ё", "е").replace("«", "\"").replace("»", "\"")
+
+
+def pairwise(t):
+    it = iter(t)
+    return zip(it, it)

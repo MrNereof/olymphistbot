@@ -62,6 +62,29 @@ class Topic(models.Model):
         return self.name
 
 
+class Leader(models.Model):
+    class Meta:
+        verbose_name = "Правитель"
+        verbose_name_plural = "Правители"
+
+    start_year = models.CharField(max_length=25, blank=True, null=True, verbose_name="Начало")
+    end_year = models.CharField(max_length=25, blank=True, null=True, verbose_name="Конец")
+
+    name = models.CharField(max_length=100, verbose_name="Название")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    image = models.ImageField(upload_to="epochs", blank=True, null=True, verbose_name="Картинка")
+
+    position = models.IntegerField(null=True, blank=True, verbose_name="Позиция")
+
+    def __str__(self):
+        start = self.start_year if self.start_year is not None else "..."
+        end = self.end_year if self.end_year is not None else "..."
+
+        if start == end:
+            return self.name
+        return f"{self.name} ({start} — {end})"
+
+
 class QuestionType(models.Model):
     class Meta:
         verbose_name = "Тип вопроса"
@@ -93,6 +116,7 @@ class Question(models.Model):
     type = models.ForeignKey(QuestionType, on_delete=models.CASCADE, verbose_name="Тип")
     topic = models.ForeignKey(Topic, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Тема")
     epoch = models.ForeignKey(Epoch, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Эпоха")
+    leader = models.ForeignKey(Leader, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Эпоха")
 
     image = models.ImageField(upload_to="questions", blank=True, null=True, verbose_name="Картинка")
     text = models.TextField(verbose_name="Текст вопроса")

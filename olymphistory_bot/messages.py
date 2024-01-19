@@ -4,12 +4,15 @@ TRAINING_BUTTON = "Тренироваться"
 SELECTION_MESSAGE = "Учить по эпохам или по темам:"
 SELECT_EPOCH_BUTTON = "Эпохи"
 SELECT_TOPIC_BUTTON = "Темы"
+SELECT_LEADER_BUTTON = "Правитель"
 SELECT_EPOCH = "Выберите эпоху:"
 SELECT_TOPIC = "Выберите тему:"
+SELECT_LEADER = "Выберите правителя:"
 
 
 YOU_HAVE_EPOCH_SELECTED = "<b>Вы выбрали следующую эпоху:</b>"
 YOU_HAVE_TOPIC_SELECTED = "<b>Вы выбрали следующую тему:</b>"
+YOU_HAVE_LEADER_SELECTED = "<b>Вы выбрали следующего правителя:</b>"
 SELECTED = "<b>{title}</b>\n\n<i>{description}</i>\n"
 SELECTED_TITLE = "<b><i>{title}</i></b>"
 

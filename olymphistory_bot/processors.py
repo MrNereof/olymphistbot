@@ -12,8 +12,8 @@ from django_tgbot.types.update import Update
 from olymphistory_bot import messages
 from .bot import TelegramBot
 from .bot import state_manager
-from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer, Note
-from .utils import get_callback_message, send_with_image, get_questions, process_answer
+from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer, Note, Leader
+from .utils import get_callback_message, send_with_image, get_questions, process_answer, pairwise
 
 
 @processor(state_manager, update_types=update_types.Message,
@@ -67,13 +67,14 @@ def handle_training(bot: TelegramBot, update: Update, state: TelegramState):
                             inline_keyboard=[
                                 [InlineKeyboardButton.a(messages.SELECT_EPOCH_BUTTON, callback_data="epoch"),
                                  InlineKeyboardButton.a(messages.SELECT_TOPIC_BUTTON, callback_data="topic")],
+                                [InlineKeyboardButton.a(messages.SELECT_LEADER_BUTTON, callback_data="leader")]
                             ]
                         ), parse_mode="HTML"
                         )
-    state.set_name("topic_or_epochs")
+    state.set_name("topic_or_epochs_or_leader")
 
 
-@processor(state_manager, from_states="topic_or_epochs", update_types=update_types.CallbackQuery)
+@processor(state_manager, from_states="topic_or_epochs_or_leader", update_types=update_types.CallbackQuery)
 def handle_selection(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
     match callback_data:
@@ -81,6 +82,8 @@ def handle_selection(bot: TelegramBot, update: Update, state: TelegramState):
             send_epoch_selection(bot, update, state)
         case "topic":
             send_topic_selection(bot, update, state)
+        case "leader":
+            send_leader_selection(bot, update, state)
 
 
 def send_epoch_selection(bot: TelegramBot, update: Update, state: TelegramState):
@@ -92,7 +95,8 @@ def send_epoch_selection(bot: TelegramBot, update: Update, state: TelegramState)
         case None | "all":
             queryset = Epoch.objects.order_by("position").all()
         case _:
-            ids = Epoch.objects.filter(question__topic_id=topic_id).values_list("id", flat=True).distinct()
+            ids = Epoch.objects.filter(question__topic_id=topic_id).order_by("position").values_list("id",
+                                                                                                     flat=True).distinct()
             queryset = Epoch.objects.filter(id__in=ids)
 
     keyboard = [[InlineKeyboardButton.a(text="Все", callback_data="epoch_all")]] + [
@@ -141,6 +145,21 @@ def send_topic_selection(bot: TelegramBot, update: Update, state: TelegramState)
     state.set_name("theme_selected")
 
 
+def send_leader_selection(bot: TelegramBot, update: Update, state: TelegramState):
+    chat_id, message_id = get_callback_message(update)
+
+    keyboard = [[InlineKeyboardButton.a(text=str(leader), callback_data=f"leader_{leader.id}")] for leader in
+                Leader.objects.order_by("position")]
+
+    bot.editMessageText(messages.SELECT_TOPIC, chat_id=chat_id, message_id=message_id,
+                        reply_markup=InlineKeyboardMarkup.a(
+                            inline_keyboard=keyboard
+                        ), parse_mode="HTML"
+                        )
+
+    state.set_name("theme_selected")
+
+
 @processor(state_manager, from_states="theme_selected", update_types=update_types.CallbackQuery)
 def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramState):
     callback_data = update.get_callback_query().get_data()
@@ -152,7 +171,8 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
             obj = send_selected(bot, update, state, epoch, messages.YOU_HAVE_EPOCH_SELECTED, Epoch, "epoch")
 
             if "topic" not in state.get_memory():
-                if obj and Topic.objects.filter(question__epoch=obj).values_list("id", flat=True).distinct().count() <= 1:
+                if obj and Topic.objects.filter(question__epoch=obj).values_list("id",
+                                                                                 flat=True).distinct().count() <= 1:
                     state.update_memory({"topic": "all"})
                 else:
                     send_topic_selection(bot, update, state)
@@ -164,11 +184,17 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
             obj = send_selected(bot, update, state, topic, messages.YOU_HAVE_TOPIC_SELECTED, Topic, "topic")
 
             if "epoch" not in state.get_memory():
-                if obj and Epoch.objects.filter(question__topic=obj).values_list("id", flat=True).distinct().count() <= 1:
+                if obj and Epoch.objects.filter(question__topic=obj).values_list("id",
+                                                                                 flat=True).distinct().count() <= 1:
                     state.update_memory({"epoch": "all"})
                 else:
                     send_epoch_selection(bot, update, state)
                     return
+
+        case callback_data if callback_data.startswith("leader_"):
+            leader = callback_data.replace("leader_", "")
+
+            send_selected(bot, update, state, leader, messages.YOU_HAVE_TOPIC_SELECTED, Leader, "leader")
 
     data = state.get_memory()
     if "epoch" in data and "topic" in data:
