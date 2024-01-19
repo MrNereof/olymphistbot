@@ -151,7 +151,7 @@ def send_leader_selection(bot: TelegramBot, update: Update, state: TelegramState
     keyboard = [[InlineKeyboardButton.a(text=str(leader), callback_data=f"leader_{leader.id}")] for leader in
                 Leader.objects.order_by("position")]
 
-    bot.editMessageText(messages.SELECT_TOPIC, chat_id=chat_id, message_id=message_id,
+    bot.editMessageText(messages.SELECT_LEADER, chat_id=chat_id, message_id=message_id,
                         reply_markup=InlineKeyboardMarkup.a(
                             inline_keyboard=keyboard
                         ), parse_mode="HTML"
@@ -194,7 +194,7 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
         case callback_data if callback_data.startswith("leader_"):
             leader = callback_data.replace("leader_", "")
 
-            send_selected(bot, update, state, leader, messages.YOU_HAVE_TOPIC_SELECTED, Leader, "leader")
+            send_selected(bot, update, state, leader, messages.YOU_HAVE_LEADER_SELECTED, Leader, "leader")
 
     data = state.get_memory()
     if "leader" in data or ("epoch" in data and "topic" in data):
