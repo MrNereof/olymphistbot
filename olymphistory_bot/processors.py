@@ -197,7 +197,7 @@ def handle_theme_selection(bot: TelegramBot, update: Update, state: TelegramStat
             send_selected(bot, update, state, leader, messages.YOU_HAVE_TOPIC_SELECTED, Leader, "leader")
 
     data = state.get_memory()
-    if "epoch" in data and "topic" in data:
+    if "leader" in data or ("epoch" in data and "topic" in data):
         send_level_selection(bot, update, state)
 
 
