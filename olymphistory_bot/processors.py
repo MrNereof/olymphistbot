@@ -352,16 +352,26 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
 
         bot.sendMessage(chat_id, messages.RESULT_ATTEMPT.format(right=right, count=count), parse_mode="HTML")
 
-        keyboard = [[InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
-                    [InlineKeyboardButton.a(text=messages.RETRY_BUTTON, callback_data="retry")]]
-        if data['tips']:
-            keyboard.insert(0, [InlineKeyboardButton.a(text=messages.MAKE_HARDER_BUTTON, callback_data="harder")])
-        if Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).exists():
-            keyboard.insert(0, [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")])
+        send_after_quiz(bot, update, state)
 
-        bot.sendMessage(chat_id, messages.ACTIONS_TEXT, reply_markup=InlineKeyboardMarkup.a(inline_keyboard=keyboard),
-                        parse_mode="HTML")
-        state.set_name("after_quiz")
+
+def send_after_quiz(bot: TelegramBot, update: Update, state: TelegramState, with_notes: bool = True):
+    chat_id = update.get_chat().get_id()
+
+    data = state.get_memory()
+
+    attempt = Attempt.objects.get(id=data["attempt"])
+
+    keyboard = [[InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
+                [InlineKeyboardButton.a(text=messages.RETRY_BUTTON, callback_data="retry")]]
+    if data['tips']:
+        keyboard.insert(0, [InlineKeyboardButton.a(text=messages.MAKE_HARDER_BUTTON, callback_data="harder")])
+    if with_notes and Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).exists():
+        keyboard.insert(0, [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")])
+
+    bot.sendMessage(chat_id, messages.ACTIONS_TEXT, reply_markup=InlineKeyboardMarkup.a(inline_keyboard=keyboard),
+                    parse_mode="HTML")
+    state.set_name("after_quiz")
 
 
 @processor(state_manager, from_states="after_quiz", update_types=update_types.CallbackQuery)
@@ -423,9 +433,4 @@ def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
                         image=note.image,
                         parse_mode="HTML")
 
-    bot.sendMessage(chat_id, messages.ACTIONS_TEXT,
-                    reply_markup=InlineKeyboardMarkup.a(inline_keyboard=[
-                        [InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
-                        [InlineKeyboardButton.a(text=messages.RETRY_BUTTON, callback_data="retry")],
-                    ]),
-                    parse_mode="HTML")
+    send_after_quiz(bot, update, state, with_notes=False)
