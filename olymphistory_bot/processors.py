@@ -354,6 +354,8 @@ def handle_question(bot: TelegramBot, update: Update, state: TelegramState):
 
         keyboard = [[InlineKeyboardButton.a(text=messages.RESTART_BUTTON, callback_data="training")],
                     [InlineKeyboardButton.a(text=messages.RETRY_BUTTON, callback_data="retry")]]
+        if data['tips']:
+            keyboard.insert(0, [InlineKeyboardButton.a(text=messages.MAKE_HARDER_BUTTON, callback_data="harder")])
         if Note.objects.filter(question__attempt=attempt, question__useranswer__right=False).exists():
             keyboard.insert(0, [InlineKeyboardButton.a(text=messages.NOTES_BUTTON, callback_data="show_notes")])
 
@@ -372,6 +374,8 @@ def handle_after_quiz(bot: TelegramBot, update: Update, state: TelegramState):
             handle_retry(bot, update, state)
         case "show_notes":
             handle_notes(bot, update, state)
+        case "harder":
+            handle_harder(bot, update, state)
 
 
 def handle_retry(bot: TelegramBot, update: Update, state: TelegramState):
@@ -383,6 +387,12 @@ def handle_retry(bot: TelegramBot, update: Update, state: TelegramState):
     bot.deleteMessage(chat_id, message_id)
 
     send_question(bot, update, state)
+
+
+def handle_harder(bot: TelegramBot, update: Update, state: TelegramState):
+    state.update_memory({"tips": False})
+
+    handle_retry(bot, update, state)
 
 
 def handle_notes(bot: TelegramBot, update: Update, state: TelegramState):
