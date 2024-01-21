@@ -95,9 +95,8 @@ def send_epoch_selection(bot: TelegramBot, update: Update, state: TelegramState)
         case None | "all":
             queryset = Epoch.objects.order_by("position").all()
         case _:
-            ids = Epoch.objects.filter(question__topic_id=topic_id).order_by("position").values_list("id",
-                                                                                                     flat=True).distinct()
-            queryset = Epoch.objects.filter(id__in=ids)
+            ids = Epoch.objects.filter(question__topic_id=topic_id).values_list("id", flat=True).distinct()
+            queryset = Epoch.objects.filter(id__in=ids).order_by("position")
 
     keyboard = [[InlineKeyboardButton.a(text="Все", callback_data="epoch_all")]] + [
         [InlineKeyboardButton.a(text=str(epoch), callback_data=f"epoch_{epoch.id}")] for epoch in queryset
