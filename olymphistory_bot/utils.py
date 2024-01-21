@@ -41,7 +41,8 @@ def get_questions(state: TelegramState):
 
 
 def get_answer_tips(question: Question, state: TelegramState, num: int = 2):
-    return set(get_questions(state).order_by('?').filter(type=question.type).exclude(answer=question.answer).values_list("answer", flat=True))[:num]
+    return list(set(get_questions(state).order_by('?').filter(type=question.type).exclude(answer=question.answer)
+               .values_list("answer", flat=True)))[:num]
 
 
 def process_answer(answer: str) -> str:
