@@ -13,7 +13,7 @@ from olymphistory_bot import messages
 from .bot import TelegramBot
 from .bot import state_manager
 from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer, Note, Leader
-from .utils import get_callback_message, send_with_image, get_questions, process_answer, pairwise
+from .utils import get_callback_message, send_with_image, get_questions, process_answer, pairwise, get_answer_tips
 
 
 @processor(state_manager, update_types=update_types.Message,
@@ -303,8 +303,8 @@ def send_question(bot: TelegramBot, update: Update, state: TelegramState):
     keyboard = []
     if data['tips']:
         keyboard = [[KeyboardButton.a(question.answer)]]
-        for q in get_questions(state).order_by('?').filter(type=question.type).exclude(answer=question.answer)[:2]:
-            keyboard.append([KeyboardButton.a(q.answer)])
+        for tip in get_answer_tips(question, state):
+            keyboard.append([KeyboardButton.a(tip)])
         random.shuffle(keyboard)
 
     send_with_image(bot, update.get_chat().get_id(),
