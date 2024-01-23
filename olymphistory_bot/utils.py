@@ -11,6 +11,7 @@ from .bot import TelegramBot
 from .models import TelegramState, Epoch, Topic, Question, Attempt, UserAnswer
 
 import typing
+import random
 import io
 
 
@@ -41,8 +42,10 @@ def get_questions(state: TelegramState):
 
 
 def get_answer_tips(question: Question, state: TelegramState, num: int = 2):
-    return list(set(get_questions(state).order_by('?').filter(type=question.type).exclude(answer=question.answer)
-               .values_list("answer", flat=True)))[:num]
+    tips = list(set(get_questions(state).order_by('?').filter(type=question.type).exclude(answer=question.answer)
+               .values_list("answer", flat=True)))
+    random.shuffle(tips)
+    return tips[:num]
 
 
 def process_answer(answer: str) -> str:
