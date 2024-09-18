@@ -52,6 +52,7 @@ class TelegramUserAdmin(admin.ModelAdmin):
 
     def broadcast(self, request, queryset):
         """ Select users via check mark in django-admin panel, then select "Broadcast" to send message"""
+        self.message_user(request, str(queryset))
         user_ids = queryset.values_list('telegram_id', flat=True).distinct().iterator()
         if 'apply' in request.POST:
             broadcast_message_text = request.POST["broadcast_text"]
