@@ -53,17 +53,17 @@ class TelegramUserAdmin(admin.ModelAdmin):
     def broadcast(self, request, queryset):
         """ Select users via check mark in django-admin panel, then select "Broadcast" to send message"""
         self.message_user(request, str(queryset))
-        user_ids = queryset.values_list('telegram_id', flat=True).distinct().iterator()
+        ids = queryset.values_list('id', flat=True).distinct().iterator()
         if 'apply' in request.POST:
             broadcast_message_text = request.POST["broadcast_text"]
 
-            for user_id in user_ids:
+            for user_id in TelegramUser.objects.filter(id__in=ids):
                 bot.sendMessage(user_id, broadcast_message_text, parse_mode="HTML")
             self.message_user(request, f"Just broadcasted to {len(queryset)} users")
 
             return HttpResponseRedirect(request.get_full_path())
         else:
-            form = BroadcastForm(initial={'_selected_action': user_ids})
+            form = BroadcastForm(initial={'_selected_action': ids})
             return render(
                 request, "admin/broadcast_message.html", {'form': form, 'title': 'Broadcast message'}
             )
