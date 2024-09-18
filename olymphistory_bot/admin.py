@@ -57,8 +57,8 @@ class TelegramUserAdmin(admin.ModelAdmin):
         if 'apply' in request.POST:
             broadcast_message_text = request.POST["broadcast_text"]
 
-            for user_id in TelegramUser.objects.filter(id__in=ids):
-                bot.sendMessage(user_id, broadcast_message_text, parse_mode="HTML")
+            for user in TelegramUser.objects.filter(id__in=ids):
+                bot.sendMessage(user.telegram_id, broadcast_message_text, parse_mode="HTML")
             self.message_user(request, f"Just broadcasted to {len(queryset)} users")
 
             return HttpResponseRedirect(request.get_full_path())
